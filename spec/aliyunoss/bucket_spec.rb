@@ -1,10 +1,10 @@
 require 'rspec'
-require 'aliyun/oss'
+require 'aliyunoss'
 
 describe Aliyun::Oss::Bucket do
 
   before :all do
-    Aliyun::Oss.configure_with('spec/aliyun/oss/aliyun-config.yml')
+    Aliyun::Oss.configure_with('spec/aliyunoss/aliyun-config.yml')
   end
 
   before :each do

@@ -1,10 +1,10 @@
 require 'rspec'
-require 'aliyun/oss'
+require 'aliyunoss'
 
 describe Aliyun::Oss::API do
 
   before :all do
-    Aliyun::Oss.configure_with('spec/aliyun/oss/aliyun-config.yml')
+    Aliyun::Oss.configure_with('spec/aliyunoss/aliyun-config.yml')
 #    Aliyun::Oss.configure(:log_level=> 'debug')
     bucket_name = 'aliyun-oss-gem-api-test'
     response = Aliyun::Oss::API.put_bucket(bucket_name)

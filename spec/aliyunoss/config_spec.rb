@@ -1,5 +1,5 @@
 require 'rspec'
-require 'aliyun/oss'
+require 'aliyunoss'
 
 describe 'Aliyun::Oss Configuration' do
 
@@ -30,14 +30,14 @@ describe 'Aliyun::Oss Configuration' do
   end
 
   it 'should load yaml config file if specified' do
-    Aliyun::Oss.configure_with('spec/aliyun/oss/aliyun-config.yml.sample')
+    Aliyun::Oss.configure_with('spec/aliyunoss/aliyun-config.yml.sample')
     config = Aliyun::Oss.config
     expect(config[:host]).to eq('bucket_name.region.aliyuncs.com')
     expect(config[:access_key_id]).to eq('access key _id from aliyun')
   end
 
   it 'should load default configuration if incorrect yaml file specified' do
-    Aliyun::Oss.configure_with('spec/aliyun/oss/incorrect-config.yml')
+    Aliyun::Oss.configure_with('spec/aliyunoss/incorrect-config.yml')
     config = Aliyun::Oss.config
     expect(config[:host]).not_to eq('aliyun-yaml.com')
     expect(config[:access_key_id]).not_to eq('1234567890')    

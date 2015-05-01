@@ -1,6 +1,6 @@
 # coding: utf-8
 require 'rspec'
-require 'aliyun/oss'
+require 'aliyunoss'
 
 describe Aliyun::Oss::OssRequest do
 
