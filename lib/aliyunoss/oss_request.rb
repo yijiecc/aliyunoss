@@ -52,7 +52,6 @@ module Aliyun
           Net::HTTP.start(uri.host, uri.port) do |http|
             response = http.request(request)
             logger.info(response.code.to_s + ' ' + response.message)
-            logger.debug(response.body)
           end
           response          
         end
@@ -64,8 +63,16 @@ module Aliyun
       add_operation :head
       add_operation :post
 
-      def url_for_sharing(expires)
-        raise "not implemented"
+      def url_for_sharing(expires_in)
+        uri = get_uri
+        request = Net::HTTP::Get.new(uri)
+        @headers.each_pair {|k,v| request[k] = v}
+        expires_at = (Time.now + expires_in).utc.to_i
+        request["Date"] = expires_at
+        uri.query = URI.encode_www_form({"OSSAccessKeyId" => access_key_id,
+                                         "Expires" => expires_at,
+                                         "Signature" => signature(request)})
+        uri.to_s
       end
 
       def [](key)
@@ -112,10 +119,7 @@ module Aliyun
         end
 
         return "" if hash.count == 0
-        
-        array = Array.new
-        hash.each_pair {|k,v| array << k + ":" + v }
-        array.sort.join("\n") << "\n"
+        hash.keys.sort.map{|k| "#{k}:#{hash[k]}"}.join("\n") << "\n"
       end
 
       # oss api 20140828.pdf - 4.2
@@ -131,9 +135,11 @@ module Aliyun
       def canonicalized_resource()
         return @path unless @bucket
         return "/#{@bucket.name}#{@path}" if @queries.count == 0
-        
-        array = Array.new
-        @queries.each_pair {|k,v| array << (if v then k+"="+v else k end)}
+
+        array =  @queries.keys.sort.map do |k|
+          if @queries[k] then "#{k}=#{@queries[k]}" else "#{k}" end
+        end
+          
         "/#{@bucket.name}#{@path}?#{array.sort.join('&')}"
       end
 

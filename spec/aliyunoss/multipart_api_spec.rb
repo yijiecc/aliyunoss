@@ -1,19 +1,17 @@
 require 'rspec'
 require 'aliyunoss'
+require 'spec_helper'
 
-describe Aliyun::Oss::API do
+describe "multipart api" do
 
   before :all do
-    Aliyun::Oss.configure_with('spec/aliyunoss/aliyun-config.yml')
-    Aliyun::Oss.configure(:log_level=> 'debug')
-    bucket_name = 'aliyun-oss-gem-api-test'
-    response = Aliyun::Oss::API.put_bucket(bucket_name)
-    expect(response).to be_a(Net::HTTPOK)
-  end
-
-  before :each do
+    Aliyun::Oss.configure_with('spec/aliyunoss/config/aliyun-config.yml')
+    bucket_name = "aliyunoss-gem-test-#{rand.to_s.delete('0.')}"
+    location = 'oss-cn-beijing'
+    response = Aliyun::Oss::API.put_bucket(bucket_name, location)
+    expect(response).to be_a(Net::HTTPOK)     
     @api = Aliyun::Oss::API
-    @bucket = Aliyun::Oss::Bucket.new(name: 'aliyun-oss-gem-api-test', location: 'oss-cn-hangzhou')
+    @bucket = Aliyun::Oss::Bucket.new(name: bucket_name, location: location)
   end
 
   it 'should upload data in multipart way' do
@@ -67,8 +65,6 @@ describe Aliyun::Oss::API do
     upload_id = Nokogiri::XML(response.body).xpath('//UploadId')[0].content
     expect(upload_id).to_not be_nil
 
-    data = Random.new.bytes(1024 * rand(100..300))
-
     response = @api.multipart_upload_from_copy(upload_id, @bucket, '/multi-part-test.dat',
                                                @bucket, path, 1, 1024*500)
     expect(response).to be_a(Net::HTTPOK)
@@ -96,8 +92,8 @@ describe Aliyun::Oss::API do
   end
 
   it 'should delete this bucket' do
-   response = Aliyun::Oss::API.delete_bucket(@bucket)
-   expect(response).to be_a(Net::HTTPNoContent)
+    response = Aliyun::Oss::API.delete_bucket(@bucket)
+    expect(response).to be_a(Net::HTTPNoContent)
   end
-  
+
 end

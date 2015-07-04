@@ -1,16 +1,14 @@
 require 'rspec'
 require 'aliyunoss'
+require 'spec_helper'
 
 describe Aliyun::Oss::Bucket do
 
   before :all do
-    Aliyun::Oss.configure_with('spec/aliyunoss/aliyun-config.yml')
-  end
-
-  before :each do
-    @bucket_name = 'aliyun-oss-gem-api-test'
-    @location = 'oss-cn-hangzhou'
-    @bucket = Aliyun::Oss::Bucket.all.select {|b| b.name == @bucket_name} .first
+    Aliyun::Oss.configure_with('spec/aliyunoss/config/aliyun-config.yml')
+    @bucket_name = "aliyunoss-gem-test-#{rand.to_s.delete('0.')}"
+    @location = 'oss-cn-beijing'
+    @bucket = Aliyun::Oss::Bucket.new( location: @location, name: @bucket_name)
   end
   
   it 'should create a bucket' do
@@ -29,11 +27,17 @@ describe Aliyun::Oss::Bucket do
   end
   
   it 'should upload data to server' do    
-    files = ['test-1.png','test-2.png','test-3.png'].map {|f|  File.join(__dir__, f)}
+    files = ['test-1.png','test-2.png','test-3.png'].map {|f|  File.join(__dir__, 'png',f)}
     files.each do |f|
       data = IO.read(f)
       @bucket.upload(data, "/" + f[/test-\d\.png/], 'Content-Type'=>'image/png')
     end    
+  end
+
+  it 'should generate share url' do
+    url = @bucket.share("/test-1.png")
+    data = Net::HTTP.get(URI(url))
+    expect(data.length).to eq(File.open( File.join(__dir__, "png", "test-1.png")).size)
   end
 
   it 'should upload data to server in multipart way' do
@@ -48,7 +52,6 @@ describe Aliyun::Oss::Bucket do
   end
 
   it 'should copy data in multipart way' do
-    pending 'I get Forbidden using x-oss-copy-source-range'
     source_path = '/multi-part-test.dat'
     source_object = @bucket.list_files.select {|f| '/' + f['key'] == source_path} .first
     source_size = source_object['size'].to_i
@@ -62,7 +65,7 @@ describe Aliyun::Oss::Bucket do
   it 'should download file from server' do
     ['/test-1.png','/test-2.png','/test-3.png'].each do |path|
       remote_data = @bucket.download(path)
-      local_data = IO.read(File.join(__dir__, path))
+      local_data = IO.read(File.join(__dir__, 'png', path))
       md5 = OpenSSL::Digest::MD5
       expect(md5.digest(remote_data)).to eq(md5.digest(local_data))
     end
@@ -75,25 +78,38 @@ describe Aliyun::Oss::Bucket do
   end
 
   it 'should get and modify logging status' do
-    @bucket.enable_logging('aliyun-oss-gem-api-test', 'access_log')
-    sleep(2)
-    expect(@bucket.logging_status['target_bucket']).to eq('aliyun-oss-gem-api-test')
-    expect(@bucket.logging_status['target_prefix']).to eq('access_log')
+    @bucket.enable_logging(@bucket_name, 'access_log')
+    status = @bucket.logging_status
+    # it seems that changes do not take effect immediately
+    # aliyun return loggint enabled status but without target_prefix
+    # so we retry
+    status = @bucket.logging_status
+    status = @bucket.logging_status if status.count == 0
+    status = @bucket.logging_status if status.count == 0
+    expect(status['target_bucket']).to eq(@bucket_name)
+    expect(status['target_prefix']).to eq('access_log')
     @bucket.disable_logging
   end
 
   it 'should get and modify website access status' do
     @bucket.enable_website_access('index.html','error.html')
-    sleep(2)
-    expect(@bucket.website_access_status['index_page']).to eq('index.html')
-    expect(@bucket.website_access_status['error_page']).to eq('error.html')
+    retries = 0
+    begin
+      status = @bucket.website_access_status
+    rescue
+      retry if (retries+=1) <= 5
+    end
+    expect(status['index_page']).to eq('index.html')
+    expect(status['error_page']).to eq('error.html')
     @bucket.disable_website_access
   end
 
   it 'should get and set access control list' do
     @bucket.set_acl('public-read')
-    sleep(2)
-    expect(@bucket.get_acl).to eq('public-read')
+    status = @bucket.get_acl
+    status = @bucket.get_acl if status == 'private'
+    status = @bucket.get_acl if status == 'private'
+    expect(status).to eq('public-read')
     @bucket.set_acl('private')
   end
 

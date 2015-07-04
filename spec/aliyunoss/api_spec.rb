@@ -1,19 +1,18 @@
 require 'rspec'
 require 'aliyunoss'
+require 'spec_helper'
 
 describe Aliyun::Oss::API do
 
   before :all do
-    Aliyun::Oss.configure_with('spec/aliyunoss/aliyun-config.yml')
-#    Aliyun::Oss.configure(:log_level=> 'debug')
-    bucket_name = 'aliyun-oss-gem-api-test'
-    response = Aliyun::Oss::API.put_bucket(bucket_name)
+    Aliyun::Oss.configure_with('spec/aliyunoss/config/aliyun-config.yml')
+    bucket_name = "aliyunoss-gem-test-#{rand.to_s.delete('0.')}"
+    location = 'oss-cn-beijing'
+    response = Aliyun::Oss::API.put_bucket(bucket_name, location)
     expect(response).to be_a(Net::HTTPOK)
-  end
 
-  before :each do
     @api = Aliyun::Oss::API
-    @bucket = Aliyun::Oss::Bucket.new(name: 'aliyun-oss-gem-api-test', location: 'oss-cn-hangzhou')
+    @bucket = Aliyun::Oss::Bucket.new(name: bucket_name, location: location)
   end
 
   it 'should get bucket list using GetService api' do
@@ -44,7 +43,7 @@ describe Aliyun::Oss::API do
     response = @api.get_bucket_location(@bucket)
     expect(response).to be_a(Net::HTTPOK)
     node = Nokogiri::XML(response.body).xpath('//LocationConstraint')[0]
-    expect(node.content).to eq('oss-cn-hangzhou')
+    expect(node.content).to include('oss-cn-')
   end
 
   it 'should get bucket logging status' do
@@ -74,12 +73,19 @@ describe Aliyun::Oss::API do
   end
 
   it 'should upload file' do
-    files = ['test-1.png','test-2.png','test-3.png'].map {|f|  File.join(__dir__, f)}
+    files = ['test-1.png','test-2.png','test-3.png'].map {|f|  File.join(__dir__, 'png', f)}
     files.each do |f|
       data = IO.read(f)
       response = @api.put_object(@bucket, "/" + f[/test-\d\.png/], data, 'Content-Type'=>'image/png')
       expect(response).to be_a(Net::HTTPOK)
     end
+  end
+
+  it 'should generate share url for uploaded file' do
+    path = '/test-1.png'
+    url = @api.generate_share_url(@bucket, path, 7200)
+    data = Net::HTTP.get(URI(url))
+    expect(data.length).to eq(File.open( File.join(__dir__, 'png', path)).size)
   end
 
   it 'should copy object' do
@@ -96,7 +102,7 @@ describe Aliyun::Oss::API do
 
   it 'should get object from oss' do
     response = @api.get_object(@bucket, '/copy-test-1.png')
-    file_name = File.join(__dir__, 'test-1.png')
+    file_name = File.join(__dir__, 'png', 'test-1.png')
     expect(response['Content-Length']).to eq(File.size(file_name).to_s)
     expect(response['Content-Type']).to eq('image/png')
   end
@@ -110,13 +116,12 @@ describe Aliyun::Oss::API do
 
   it 'should delete multiple objects' do
     response = @api.delete_multiple_objects(@bucket, ['copy-test-2.png','copy-test-3.png', 'copy-test-1.png'])
-    puts response.body
     expect(response).to be_a(Net::HTTPOK)
   end
   
   it 'should delete this bucket' do
-   response = @api.delete_bucket(@bucket)
-   expect(response).to be_a(Net::HTTPNoContent)    
+    response = @api.delete_bucket(@bucket)
+    expect(response).to be_a(Net::HTTPNoContent)    
   end
   
 end

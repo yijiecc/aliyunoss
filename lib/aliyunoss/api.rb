@@ -160,7 +160,10 @@ HERE
         request.put
       end
 
-      
+      # get share url for specified object
+      def generate_share_url(bucket, path, expires_in = 3600)
+        Aliyun::Oss::OssRequest.new(bucket, path).url_for_sharing(expires_in)
+      end
 
       # Post Object
       # Not implemented
@@ -186,13 +189,13 @@ HERE
         request = Aliyun::Oss::OssRequest.new(target_bucket, target_path, 'partNumber'=> part_number.to_s, 'uploadId'=> upload_id)
         request['Content-Length'] = part_size
         request['x-oss-copy-source'] = "/" + source_bucket.name + source_path
-        request['x-oss-copy-source-range'] = range if range        
+        request['x-oss-copy-source-range'] = range if range
         request.put
       end
 
       def multipart_upload_complete(bucket, path, upload_id, part_list)
         request = Aliyun::Oss::OssRequest.new(bucket, path, 'uploadId'=> upload_id)
-        xml = '<?xml version="1.0" encoding="UTF-8"?>'        
+        xml = '<?xml version="1.0" encoding="UTF-8"?>'   
         xml << '<CompleteMultipartUpload>'
         part_list.each_pair {|k,v| xml << "<Part><PartNumber>#{k}</PartNumber><ETag>#{v}</ETag></Part>"}
         xml << '</CompleteMultipartUpload>'
