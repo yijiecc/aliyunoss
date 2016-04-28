@@ -48,7 +48,7 @@ module Net
       nodes = Nokogiri::XML(self.body).xpath('//Bucket') rescue []
       nodes.map do |node|
         bucket = Aliyun::Oss::Bucket.new
-        node.elements.each {|e| bucket.send("#{e.name.underscore}=".to_sym, e.content)}
+        node.elements.each {|e| bucket.send("#{e.name.underscore}=".to_sym, e.content) rescue nil }
         bucket
       end
     end

@@ -9,8 +9,9 @@ describe Aliyun::Oss::API do
     bucket_name = "aliyunoss-gem-test-#{rand.to_s.delete('0.')}"
     location = 'oss-cn-beijing'
     response = Aliyun::Oss::API.put_bucket(bucket_name, location)
-    expect(response).to be_a(Net::HTTPOK)
 
+    expect(response).to be_a(Net::HTTPOK)
+    
     @api = Aliyun::Oss::API
     @bucket = Aliyun::Oss::Bucket.new(name: bucket_name, location: location)
   end

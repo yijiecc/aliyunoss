@@ -24,7 +24,7 @@ describe Aliyun::Oss::OssRequest do
     path = '/ObjectName'
     queries = {"acl"=>nil, "uploadId"=>"UploadId",
                "response-content-type"=>"ContentType" }
-    result = Aliyun::Oss::OssRequest.new(bucket, path, queries).
+    result = Aliyun::Oss::OssRequest.new(bucket, path, nil, queries).
              send(:canonicalized_resource)
     expect(result).to eq("/BucketName/ObjectName?acl&response-content-type=ContentType&uploadId=UploadId")
 

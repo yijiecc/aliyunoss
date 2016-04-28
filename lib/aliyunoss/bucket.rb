@@ -2,7 +2,7 @@ module Aliyun
   module Oss
 
     class Bucket
-      attr_accessor :location, :name, :creation_date
+      attr_accessor :location, :name, :creation_date, :domain, :extranet_endpoint, :intranet_endpoint
 
       def initialize(params = {})
         params.each_pair {|k,v| send("#{k.to_s}=", v) }

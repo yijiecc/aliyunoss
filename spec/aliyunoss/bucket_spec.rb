@@ -31,7 +31,7 @@ describe Aliyun::Oss::Bucket do
     files.each do |f|
       data = IO.read(f)
       @bucket.upload(data, "/" + f[/test-\d\.png/], 'Content-Type'=>'image/png')
-    end    
+    end
   end
 
   it 'should generate share url' do

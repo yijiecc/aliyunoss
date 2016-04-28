@@ -114,7 +114,7 @@ module Aliyun
       def canonicalized_oss_headers(req)
         hash = Hash.new
         req.each_header do |header|          
-          header = header.to_s.downcase
+          header = header.downcase
           next unless header.start_with?('x-oss-')
           if hash.has_key?(header)
             hash[header] = hash[header] + "," + req[header].strip
