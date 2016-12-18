@@ -12,40 +12,61 @@ module Aliyun
         end
       end
 
-      # Class methods
+      # 
+      # Class method - List all buckets in my account
+      # 
       def self.all
         Aliyun::Oss::API.list_bucket.raise_unless(Net::HTTPOK).to_buckets
       end
 
+      #
+      # Class method - Create a new bucket
+      # 
       def self.create(name, location = 'oss-cn-hangzhou')
         Aliyun::Oss::API.put_bucket(name, location).raise_unless(Net::HTTPOK)
         Bucket.new(:name => name,  :location=> location, :creation_date => Time.now)
       end
 
-      # Instance Methods -- object download and upload
+      # 
+      # List all files in an bucket
+      # 
       def list_files(options = {})
         Aliyun::Oss::API.list_object(self, options).raise_unless(Net::HTTPOK).to_objects
       end
 
+      #
+      # Upload data to bucket
+      # 
       def upload(data, path, options = {})
         Aliyun::Oss::API.put_object(self, path, data, options).raise_unless(Net::HTTPOK)
       end
 
+      #
+      # Download file from remote server
+      # 
       def download(path, options = {})
         Aliyun::Oss::API.get_object(self, path, options)
           .raise_unless(Net::HTTPOK)
           .body
       end
 
+      #
+      # Generate a url that can be shared to others
+      # 
       def share(path, expires_in = 3600)
         Aliyun::Oss::API.generate_share_url(self, path, expires_in)
       end
 
+      #
+      # Delete remote file
+      # 
       def delete(path)
         Aliyun::Oss::API.delete_object(self, path).raise_unless(Net::HTTPNoContent)
       end
 
+      # 
       # Multipart upload and copy
+      # 
       def multipart_pending
         Aliyun::Oss::API.multipart_upload_unfinished_task(self)
           .raise_unless(Net::HTTPOK)
@@ -95,7 +116,9 @@ module Aliyun
         @multipart_path = nil
       end
 
-      # Instance Methods -- miscellaneous
+      # 
+      # delete this bucket
+      # 
       def delete!
         Aliyun::Oss::API.delete_bucket(self).raise_unless(Net::HTTPNoContent)
       end

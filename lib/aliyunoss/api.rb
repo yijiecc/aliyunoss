@@ -7,13 +7,14 @@ module Aliyun
       # Reference
       # http://docs-aliyun-com-cn-b.oss-cn-hangzhou.aliyuncs.com/oss/pdf/oss_api-reference.pdf
 
-      # List all buckets
       def list_bucket(params = {})
         Aliyun::Oss::OssRequest.new(nil, '/', nil, {}, {}).get
       end
       alias :get_service :list_bucket
 
+      # 
       # Create a new bucket
+      # 
       def put_bucket(name, location = 'oss-cn-hangzhou')
         bucket = Bucket.new(name: name, location: location)
         request = Aliyun::Oss::OssRequest.new(bucket, '/')
@@ -27,54 +28,74 @@ HERE
       end
       alias :create_bucket :put_bucket
 
+      # 
       # Delete a bucket
+      # 
       def delete_bucket(bucket)
         Aliyun::Oss::OssRequest.new(bucket, '/').delete
       end
-        
+
+      # 
       # Delete bucket logging
+      # 
       def delete_logging(bucket)
         Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'logging'=>nil).delete
       end
 
+      # 
       # Delete bucket website
+      # 
       def delete_website(bucket)
         Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'website'=>nil).delete
       end
       alias :disable_website :delete_website
 
+      # 
       # List objects in bucket
+      # 
       def list_object(bucket, queries = {})
         Aliyun::Oss::OssRequest.new(bucket, '/', nil, queries).get
       end
 
+      # 
       # Get bucket acl
+      # 
       def get_bucket_acl(bucket)
         Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'acl'=>nil).get
       end
 
+      # 
       # Get bucket location
+      # 
       def get_bucket_location(bucket)
         Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'location'=>nil).get
       end
 
+      # 
       # Query bucket logging status
+      # 
       def get_bucket_logging(bucket)
         Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'logging'=>nil).get
       end
 
+      # 
       # Query bucket website status
+      # 
       def get_bucket_website(bucket)
         Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'website'=>nil).get
       end
 
+      # 
       # Set bucket acl permission
+      # 
       def put_bucket_acl(bucket, permission)
         Aliyun::Oss::OssRequest.new(bucket, '/', nil, {}, 'x-oss-acl'=> permission).put
       end
       alias :set_bucket_acl :put_bucket_acl
 
-      # Enable or disable bucket logging
+      # 
+      # Enable bucket logging
+      # 
       def enable_bucket_logging(bucket, bucket_name_for_logging, log_prefix)
         request = Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'logging'=>nil)
         request.body = <<HERE
@@ -90,6 +111,9 @@ HERE
         request.put
       end
 
+      # 
+      # Disable bucket logging
+      #       
       def disable_bucket_logging(bucket)
         request = Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'logging'=>nil)
         request.body = <<HERE
@@ -101,7 +125,9 @@ HERE
         request.put        
       end
 
+      # 
       # Set bucket website access
+      # 
       def put_bucket_website(bucket, index_page, error_page)
         request = Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'website'=>nil)
         request.body = <<HERE
@@ -119,19 +145,25 @@ HERE
         request.put
       end
       alias :set_bucket_website :put_bucket_website
-      
+
+      # 
       # Copy Object
+      # 
       def copy_object(source_bucket, source_path, target_bucket, target_path, headers = {})
         headers = headers.merge({'x-oss-copy-source'=> "/" + source_bucket.name + source_path})
         Aliyun::Oss::OssRequest.new(target_bucket, target_path, nil, {}, headers).put
       end
 
+      # 
       # Delete Object
+      # 
       def delete_object(bucket, path)
         Aliyun::Oss::OssRequest.new(bucket, path).delete
       end
 
+      # 
       # Delete Multiple Object
+      # 
       def delete_multiple_objects(bucket, objects, quiet_mode = false)
         xml = '<?xml version="1.0" encoding="UTF-8"?>'
         xml << '<Delete>'
@@ -143,48 +175,70 @@ HERE
         request.post
       end
 
+      # 
       # Get Object
+      # 
       def get_object(bucket, path, headers = {})
         Aliyun::Oss::OssRequest.new(bucket, path, nil, {}, headers).get
       end
 
+      # 
       # Head Object
+      # 
       def head_object(bucket, path, headers = {})
         Aliyun::Oss::OssRequest.new(bucket, path, nil, {}, headers).head
       end
 
+      # 
       # Put Object
+      # 
       def put_object(bucket, path, data, headers = {})
         request = Aliyun::Oss::OssRequest.new(bucket, path, nil, {}, headers)
         request.body = data
         request.put
       end
 
+      # 
       # get share url for specified object
+      # 
       def generate_share_url(bucket, path, expires_in = 3600)
         Aliyun::Oss::OssRequest.new(bucket, path).url_for_sharing(expires_in)
       end
 
+      # 
       # Post Object
+      #
       # Not implemented
 
+      # 
       # Post Policy
+      # 
       # Not implemented
 
+      # 
       # Post signature
+      # 
       # Not implemented
 
+      # 
       # Multipart Initiate
+      # 
       def multipart_upload_initiate(bucket, path)
         Aliyun::Oss::OssRequest.new(bucket, path, nil, 'uploads'=>nil).post
       end
 
+      #
+      # Multipart upload part
+      # 
       def multipart_upload_part(bucket, path, upload_id, data, part_number)
         request = Aliyun::Oss::OssRequest.new(bucket, path, nil, 'partNumber'=> part_number.to_s, 'uploadId'=> upload_id)
         request.body = data
         request.put
       end
 
+      #
+      # Multipart upload from copy
+      # 
       def multipart_upload_from_copy(upload_id, source_bucket, source_path, target_bucket, target_path, part_number, part_size, range = nil)
         request = Aliyun::Oss::OssRequest.new(target_bucket, target_path, nil, 'partNumber'=> part_number.to_s, 'uploadId'=> upload_id)
         request['Content-Length'] = part_size
@@ -193,6 +247,9 @@ HERE
         request.put
       end
 
+      #
+      # Complete an multipart upload.
+      # 
       def multipart_upload_complete(bucket, path, upload_id, part_list)
         request = Aliyun::Oss::OssRequest.new(bucket, path, nil, 'uploadId'=> upload_id)
         xml = '<?xml version="1.0" encoding="UTF-8"?>'   
@@ -203,14 +260,23 @@ HERE
         request.post
       end
 
+      #
+      # Abort an upload task
+      # 
       def multipart_upload_abort(bucket, path, upload_id)
         Aliyun::Oss::OssRequest.new(bucket, path, nil, 'uploadId'=> upload_id).delete
       end
 
+      #
+      # List finished multipart parts
+      # 
       def multipart_upload_finished_parts(bucket, path, upload_id)
         Aliyun::Oss::OssRequest.new(bucket, path, nil, 'uploadId'=> upload_id).get
       end
 
+      #
+      # List all unfinished multipart task
+      # 
       def multipart_upload_unfinished_task(bucket)
         Aliyun::Oss::OssRequest.new(bucket, '/', nil, 'uploads'=>nil).get
       end
