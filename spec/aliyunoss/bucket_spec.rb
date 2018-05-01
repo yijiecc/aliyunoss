@@ -119,7 +119,7 @@ describe Aliyun::Oss::Bucket do
     end
     
     @bucket.delete!
-    expect {Bucket.new(:name=> 'bucket_not_exist').delete!}.to raise_error
+    expect {Aliyun::Oss::Bucket.new(:name=> 'bucket_not_exist').delete!}.to raise_error(SocketError)
   end
   
 end

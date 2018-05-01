@@ -12,11 +12,15 @@ gem 'aliyunoss'
 
 And then execute:
 
-    $ bundle
+```ruby
+$ bundle
+```
 
 Or install it yourself as:
 
-    $ gem install aliyunoss
+```ruby
+$ gem install aliyunoss
+```
 
 ## Usage
 
@@ -27,13 +31,13 @@ This gem provides high level interfaces which are built around class Bucket and 
 Specify you access key and access secret before calling methods provided in this gem:
 
 ```ruby
-	Aliyun::Oss::configure(:access_key_id => 'access key id from aliyun', :access_key_secret => 'access secret from aliyun')
+Aliyun::Oss::configure(:access_key_id => 'access key id from aliyun', :access_key_secret => 'access secret from aliyun')
 ```
 	
 When using this gem in a rails project, you can create a file named 'aliyunoss_key.rb' in RAILS\_ROOT/config/initializers, whose content is: 
 
 ```ruby
-	Aliyun::Oss::configure(:access_key_id => 'access key id from aliyun', :access_key_secret => 'access secret from aliyun')
+Aliyun::Oss::configure(:access_key_id => 'access key id from aliyun', :access_key_secret => 'access secret from aliyun')
 ```
 	
 Then you can use the following APIs anywhere.
@@ -43,18 +47,18 @@ Then you can use the following APIs anywhere.
 High level interface are built around class Bucket. You create a new bucket, and upload, download or delete files in it. When needed, responses are parsed to array, hash or object etc, thus more meaningful. Exceptions will be raised when request failed.
 
 ```ruby
-	# Create a bucket in OSS server
-	bucket = Aliyun::Oss::Bucket.create('aliyun-oss-gem-api-test','oss-cn-hangzhou')
+# Create a bucket in OSS server
+bucket = Aliyun::Oss::Bucket.create('aliyun-oss-gem-api-test','oss-cn-hangzhou')
 	
-	# Upload a file
-	filename = '/some/file'
-	bucket.upload( IO.read(filename) )
+# Upload a file
+filename = '/some/file'
+bucket.upload( IO.read(filename) )
 	
-	# List all files in this bucket, returns a Hash array containing files info
-	files = bucket.list_files
+# List all files in this bucket, returns a Hash array containing files info
+files = bucket.list_files
 	
-	# Download a file, returns raw data
-	data = bucket.download( '/some/path' )
+# Download a file, returns raw data
+data = bucket.download( '/some/path' )
 ```
 	
 #### List all buckets
@@ -62,16 +66,16 @@ High level interface are built around class Bucket. You create a new bucket, and
 After correctly configuring your access key and secret, you can list all buckets:
 
 ```ruby
-	Aliyun::Oss::Bucket.all
+Aliyun::Oss::Bucket.all
 ```
 
 The result is a Bucket array. Class Bucket has some simple attributes :
 
 ```ruby
-    class Bucket
-      attr_accessor :location, :name, :creation_date, :domain, :extranet_endpoint, :intranet_endpoint
-      # ...
-    end
+class Bucket
+  attr_accessor :location, :name, :creation_date, :domain, :extranet_endpoint, :intranet_endpoint
+  # ...
+end
 ```
 
 #### Create a new bucket
@@ -79,7 +83,7 @@ The result is a Bucket array. Class Bucket has some simple attributes :
 You can create a new bucket using class method *create* of Bucket:
 
 ```ruby
-	bucket = Aliyun::Oss::Bucket.create(bucket_name, bucket_location)
+bucket = Aliyun::Oss::Bucket.create(bucket_name, bucket_location)
 ```
 	
 Where *bucket_name* is a string, and *bucket_location* is an optional string parameter which defaults to 'oss-cn-hangzhou'. Other available bucket locations can be referenced [here][5]. This method return a new Bucket instance if success.
@@ -89,27 +93,27 @@ Where *bucket_name* is a string, and *bucket_location* is an optional string par
 You can list all files in an bucket using instance method *list\_files* of a bucket:
 
 ```ruby
-    files  = bucket.list_files
+files  = bucket.list_files
 ```
 
 The result is a array consisted of file objects which are parsed from xml reponse, eg.
 
 ```ruby
-	[
-	  { "key"=>"100f1a845046c189944dc8fd57bffbe390b90e3a.png",
-	    "last_modified"=>"2015-12-14T03:04:37.000Z",
-	    "e_tag"=>"\"B9072ECBBF4B06962517B3FD4090538E\"",
-	    "type"=>"Normal",
-	    "size"=>"49509",
-	    "storage_class"=>"Standard" },
+[
+  { "key"=>"100f1a845046c189944dc8fd57bffbe390b90e3a.png",
+    "last_modified"=>"2015-12-14T03:04:37.000Z",
+    "e_tag"=>"\"B9072ECBBF4B06962517B3FD4090538E\"",
+    "type"=>"Normal",
+    "size"=>"49509",
+    "storage_class"=>"Standard" },
 
-	  { "key"=>"11c5db2a88648d25da889a1d20687ec535a50905.jpg",
-	    "last_modified"=>"2015-12-14T08:03:54.000Z",
-	    "e_tag"=>"\"77618F54695C08E278ACBD7D9C63E521\"",
-		"type"=>"Normal",
-		"size"=>"491133",
-		"storage_class"=>"Standard" }
-	]
+{ "key"=>"11c5db2a88648d25da889a1d20687ec535a50905.jpg",
+    "last_modified"=>"2015-12-14T08:03:54.000Z",
+    "e_tag"=>"\"77618F54695C08E278ACBD7D9C63E521\"",
+	"type"=>"Normal",
+	"size"=>"491133",
+	"storage_class"=>"Standard" }
+]
 ```
 
 #### Upload file to bucket
@@ -117,15 +121,15 @@ The result is a array consisted of file objects which are parsed from xml repons
 You can upload a file using instance method *upload* of a bucket, eg.
 
 ```ruby
-	data = IO.read('/local/path/of/file')
-	bucket.upload(data, '/remote/path/of/file') 
+data = IO.read('/local/path/of/file')
+bucket.upload(data, '/remote/path/of/file') 
 ```
 
 This will raise an exception unless success. A file in remote bucket can include some meta data, eg. when serving images, we often want Aliyun OSS server to return *Content-Type* header for http GET request. To acheive this effect, we have to add additional paramters when uploading file, eg.
 
 ```ruby
-	image = IO.read('/local/image')
-	bucket.upload(image, '/remote/image', 'Content-Type'=>'image/png')
+image = IO.read('/local/image')
+bucket.upload(image, '/remote/image', 'Content-Type'=>'image/png')
 ```
 
 #### Download file from bucket
@@ -133,7 +137,7 @@ This will raise an exception unless success. A file in remote bucket can include
 You can read content of a remote file using instance method *download* of a bucket, eg.
 
 ```ruby
-    raw_data = bucket.download('/remote/path/of/file')
+raw_data = bucket.download('/remote/path/of/file')
 ```
 
 where *raw_data* is body of a Net::HTTPResponse object.
@@ -143,13 +147,13 @@ where *raw_data* is body of a Net::HTTPResponse object.
 If you set your bucket private for reading, others cannot access content of files in your bucket without valid access key and secret. But you won't give them access key or secret, instead you generate a sharing url for them to access your file:
 
 ```ruby
-    public_url = bucket.share('/remote/file')
+public_url = bucket.share('/remote/file')
 ```
 	
 This will generate a public url that can access some remote file. By default this url is only valid for 1 hour, you can change this behavior by adding the second paramter:
 
 ```ruby
-    public_url = bucket.share('/remote/file', 60 * 60 * 24)
+public_url = bucket.share('/remote/file', 60 * 60 * 24)
 ```
 
 where unit used is second, so that will be 1 day long.
@@ -159,7 +163,7 @@ where unit used is second, so that will be 1 day long.
 You can delete a remote file using instance method *delete* of a bucket, eg:
 
 ```ruby
-    bucket.delete('/remote/path/of/file')
+bucket.delete('/remote/path/of/file')
 ```
 	
 It will return an Net::HTTPNoContent if file is deleted successfully OR file not found.
@@ -169,13 +173,13 @@ It will return an Net::HTTPNoContent if file is deleted successfully OR file not
 When uploading a large file, using multipart way is preffered due to unreliable network condition. An multipart task consist of a sequence operations: *multipart\_upload\_initiate*, *multipart\_upload* and *multipart_upload_compelete*:
 
 ```ruby
-    bucket.multipart_upload_initiate('/remote/path/of/a/large/file')
+bucket.multipart_upload_initiate('/remote/path/of/a/large/file')
     
-    10.times do
-      bucket.multipart_upload( Random.new.bytes(1024 * rand(100..300)) )
-    end
+10.times do
+  bucket.multipart_upload( Random.new.bytes(1024 * rand(100..300)) )
+end
 
-    bucket.multipart_upload_complete
+bucket.multipart_upload_complete
 ```
 
 #### Delete a bucket
@@ -183,7 +187,7 @@ When uploading a large file, using multipart way is preffered due to unreliable 
 You can delete a bucket using instance method *delete!* of a bucket, eg:
 
 ```ruby
-	bucket.delete!
+bucket.delete!
 ```
 
 Exception will be raised unless bucket is empty.
@@ -193,7 +197,7 @@ Exception will be raised unless bucket is empty.
 OSS can record access log for a bucket, you can toggle this function by:
 
 ```ruby
-	bucket.enable_logging('/remote/file/of/log', 'log_prefix')
+bucket.enable_logging('/remote/file/of/log', 'log_prefix')
 ```
 
 Then all access log is recorded with prefix you specified with the second paramter, and stored in the path you specified by the first parameter.
@@ -201,7 +205,7 @@ Then all access log is recorded with prefix you specified with the second paramt
 Disable this function by:
 
 ```ruby
-	bucket.disable_logging
+bucket.disable_logging
 ```
 
 ### Low Level Interfaces
@@ -213,24 +217,24 @@ All [OSS API][2] listed are implemented except [Post Object][3] and [CORS APIs][
 List all the buckets:
 
 ```ruby
-	Aliyun::Oss::API.list_bucket
+Aliyun::Oss::API.list_bucket
 ```
 
 Upload data to specified bucket:
 
 ```ruby
-	bucket = Aliyun::Oss::Bucket.new(:name => 'bucket-name', :location => 'oss-cn-beijing')
-	path = '/test.dat'
-	data = Random.new.bytes(1024 * rand(100..300))
-	Aliyun::Oss::API.put_object(bucket, path, data)
+bucket = Aliyun::Oss::Bucket.new(:name => 'bucket-name', :location => 'oss-cn-beijing')
+path = '/test.dat'
+data = Random.new.bytes(1024 * rand(100..300))
+Aliyun::Oss::API.put_object(bucket, path, data)
 ```
 
 Download data from specified bucket:
 
 ```ruby
-	bucket = Bucket.new(:name => 'bucket-name', :location => 'oss-cn-beijing')
-	path = '/test.dat'
-	Aliyun::Oss::API.get_object(bucket, path)
+bucket = Bucket.new(:name => 'bucket-name', :location => 'oss-cn-beijing')
+path = '/test.dat'
+Aliyun::Oss::API.get_object(bucket, path)
 ```
 
 For more usage, see API documentation generated by rdoc.
