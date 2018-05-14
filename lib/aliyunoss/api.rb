@@ -1,12 +1,15 @@
 module Aliyun
   module Oss
 
+      # Reference
+      # http://docs-aliyun-com-cn-b.oss-cn-hangzhou.aliyuncs.com/oss/pdf/oss_api-reference.pdf
     module API
       extend self
 
-      # Reference
-      # http://docs-aliyun-com-cn-b.oss-cn-hangzhou.aliyuncs.com/oss/pdf/oss_api-reference.pdf
 
+      #
+      # List all buckets
+      # 
       def list_bucket(params = {})
         Aliyun::Oss::OssRequest.new(nil, '/', nil, {}, {}).get
       end

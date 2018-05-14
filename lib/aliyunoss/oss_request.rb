@@ -9,7 +9,10 @@ module Aliyun
       
       include ConfigHelper
       attr_accessor :bucket, :path, :body, :queris, :domain
-      
+
+      #
+      # Create a new oss request, parameters will be sent to methods of Net::HTTP later.
+      # 
       def initialize(bucket, path, domain = nil, queries = {}, headers = {})
         @bucket = bucket
         @path = path
@@ -18,6 +21,9 @@ module Aliyun
         @headers = {"Content-Type" => "", "Content-MD5" => "", "Date" => Time.now.utc.strftime('%a, %d %b %Y %H:%M:%S GMT')}.merge(headers)
       end
 
+      #
+      # Get complete url for this request
+      # 
       def get_uri
         if @domain
           uri = URI("http://#{domain}/")
@@ -68,6 +74,9 @@ module Aliyun
       add_operation :head
       add_operation :post
 
+      #
+      # Get sharing url for this request, pass _expires_in_ as parameter.
+      # 
       def url_for_sharing(expires_in)
         uri = get_uri
         request = Net::HTTP::Get.new(uri)
@@ -80,10 +89,16 @@ module Aliyun
         uri.to_s
       end
 
+      #
+      # Get http header value by attribute 
+      # 
       def [](key)
         @headers[key]
       end
 
+      #
+      # Set http header value by attribute
+      # 
       def []=(key, value)
         @headers[key] = value
       end

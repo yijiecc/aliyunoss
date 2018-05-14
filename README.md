@@ -2,7 +2,27 @@
 
 Ruby gem for [Aliyun Open Storage Service (OSS)][1]. This gem implemented API from [references of Aliyun OSS-API][2].
 
-## Installation
+## Table of Contents
+
+* [Installation][#installation]
+* [Usage][#usage]
+  * [Load Access Key ID and Access Key Secrete][#load]
+  * [Using Bucket API][#highlevel]
+    * [List Buckets][#listbuckets]
+	* [Create a Bucket][#newbucket]
+	* [List Files In Bucket][#listfiles]
+	* [Upload a File to Bucket][#uploadfile]
+	* [Download a File from Bucket][#downloadfile]
+	* [Share a File in Bucket][#sharefile]
+	* [Delete a File in Bucket][#deletefile]
+	* [Upload a Large File in Multipart Way][#uploadlargefile]
+	* [Delete a bucket][#deletebucket]
+	* [Enable/Disable Logging for bucket][#logging]
+  * [Using Primitive API][#lowlevel]	
+* [Test][#test]
+* [Contribute][#contribute]
+
+## <a name="installation"></a>Installation
 
 Add this line to your application's Gemfile:
 
@@ -22,11 +42,11 @@ Or install it yourself as:
 $ gem install aliyunoss
 ```
 
-## Usage
+## <a name="usage"></a>Usage
 
-This gem provides high level interfaces which are built around class Bucket and low level interfaces which are wrappers for [OSS API][2].
+This gem provides Bucket API which are built around class Bucket and Primitive API which are wrappers for [OSS API][2]. Most of time using Bucket API is OK except you find OSS API that I didn't implement.
 
-### Load Access Key ID and Access Key Secret
+### <a name="load"></a>Load Access Key ID and Access Key Secret
 
 Specify you access key and access secret before calling methods provided in this gem:
 
@@ -42,9 +62,9 @@ Aliyun::Oss::configure(:access_key_id => 'access key id from aliyun', :access_ke
 	
 Then you can use the following APIs anywhere.
 
-### High Level Interfaces
+### <a name="highlevel"></a>Bucket API
 
-High level interface are built around class Bucket. You create a new bucket, and upload, download or delete files in it. When needed, responses are parsed to array, hash or object etc, thus more meaningful. Exceptions will be raised when request failed.
+Bucket API are built around class Bucket. You create a new bucket, and upload, download or delete files in it. When needed, responses are parsed to array, hash or object etc, thus more meaningful. Exceptions will be raised when request failed.
 
 ```ruby
 # Create a bucket in OSS server
@@ -61,7 +81,7 @@ files = bucket.list_files
 data = bucket.download( '/some/path' )
 ```
 	
-#### List all buckets
+#### <a name="listbuckets"></a>List all buckets
 
 After correctly configuring your access key and secret, you can list all buckets:
 
@@ -78,7 +98,7 @@ class Bucket
 end
 ```
 
-#### Create a new bucket
+#### <a name="newbucket"></a>Create a new bucket
 
 You can create a new bucket using class method *create* of Bucket:
 
@@ -88,7 +108,7 @@ bucket = Aliyun::Oss::Bucket.create(bucket_name, bucket_location)
 	
 Where *bucket_name* is a string, and *bucket_location* is an optional string parameter which defaults to 'oss-cn-hangzhou'. Other available bucket locations can be referenced [here][5]. This method return a new Bucket instance if success.
 
-#### List all files in an bucket
+#### <a name="listfiles"></a>List all files in an bucket
 
 You can list all files in an bucket using instance method *list\_files* of a bucket:
 
@@ -116,7 +136,7 @@ The result is a array consisted of file objects which are parsed from xml repons
 ]
 ```
 
-#### Upload file to bucket
+#### <a name="uploadfile"></a>Upload a file to bucket
 
 You can upload a file using instance method *upload* of a bucket, eg.
 
@@ -132,7 +152,7 @@ image = IO.read('/local/image')
 bucket.upload(image, '/remote/image', 'Content-Type'=>'image/png')
 ```
 
-#### Download file from bucket
+#### <a name="downloadfile"></a>Download file from bucket
 
 You can read content of a remote file using instance method *download* of a bucket, eg.
 
@@ -142,7 +162,7 @@ raw_data = bucket.download('/remote/path/of/file')
 
 where *raw_data* is body of a Net::HTTPResponse object.
 
-#### Generate a sharing url of a remote file
+#### <a name="sharefile"></a>Generate a sharing url of a remote file
 
 If you set your bucket private for reading, others cannot access content of files in your bucket without valid access key and secret. But you won't give them access key or secret, instead you generate a sharing url for them to access your file:
 
@@ -158,7 +178,7 @@ public_url = bucket.share('/remote/file', 60 * 60 * 24)
 
 where unit used is second, so that will be 1 day long.
 
-#### Delete a file in the bucket
+#### <a name="deletefile"></a>Delete a file in the bucket
 
 You can delete a remote file using instance method *delete* of a bucket, eg:
 
@@ -168,7 +188,7 @@ bucket.delete('/remote/path/of/file')
 	
 It will return an Net::HTTPNoContent if file is deleted successfully OR file not found.
 
-#### Upload a large file in multipart way
+#### <a name="uploadlargefile"></a>Upload a large file in multipart way
 
 When uploading a large file, using multipart way is preffered due to unreliable network condition. An multipart task consist of a sequence operations: *multipart\_upload\_initiate*, *multipart\_upload* and *multipart_upload_compelete*:
 
@@ -182,7 +202,7 @@ end
 bucket.multipart_upload_complete
 ```
 
-#### Delete a bucket
+#### <a name="deletebucket"></a>Delete a bucket
 
 You can delete a bucket using instance method *delete!* of a bucket, eg:
 
@@ -192,7 +212,7 @@ bucket.delete!
 
 Exception will be raised unless bucket is empty.
 
-#### Enable/Disable logging for a bucket
+#### <a name="logging"></a>Enable/Disable logging for a bucket
 
 OSS can record access log for a bucket, you can toggle this function by:
 
@@ -208,9 +228,9 @@ Disable this function by:
 bucket.disable_logging
 ```
 
-### Low Level Interfaces
+### <a name="lowlevel"></a>Primitive API
 
-Low level interfaces are simple http wrappers for [OSS API][2], you send requests with specified parameters and receive responses with a Net::HTTPResponse object. All parameters listed in [OSS API][2] are needed for every request, and context information between requests is maintained by yourself. In order to tell whether a a request is success, check code and body of returned Net::HTTPResponse object.
+Primitive API are simple http wrappers for [OSS API][2], you send requests with specified parameters and receive responses with a Net::HTTPResponse object. All parameters listed in [OSS API][2] are needed for every request, and context information between requests is maintained by yourself. In order to tell whether a a request is success, check code and body of returned Net::HTTPResponse object.
 
 All [OSS API][2] listed are implemented except [Post Object][3] and [CORS APIs][4].
 
@@ -239,13 +259,13 @@ Aliyun::Oss::API.get_object(bucket, path)
 
 For more usage, see API documentation generated by rdoc.
 
-## Testing
+## <a name="test"></a>Testing
 
 This gem use rspec for testing. Most of testing needs a valid access key id and access key secret, you should get these info from Aliyun.
 
 Create a file named aliyun-config.yml in path rspec/aliyunoss/config, fill in valid access key id and access key secret and cotinue to test.
 
-## Contributing
+## <a name="contribute"></a>Contributing
 
 1. Fork it ( https://github.com/yijiecc/aliyunoss/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
