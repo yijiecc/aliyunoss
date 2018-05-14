@@ -4,23 +4,23 @@ Ruby gem for [Aliyun Open Storage Service (OSS)][1]. This gem implemented API fr
 
 ## Table of Contents
 
-* [Installation][#installation]
-* [Usage][#usage]
-  * [Load Access Key ID and Access Key Secrete][#load]
-  * [Using Bucket API][#highlevel]
-    * [List Buckets][#listbuckets]
-	* [Create a Bucket][#newbucket]
-	* [List Files In Bucket][#listfiles]
-	* [Upload a File to Bucket][#uploadfile]
-	* [Download a File from Bucket][#downloadfile]
-	* [Share a File in Bucket][#sharefile]
-	* [Delete a File in Bucket][#deletefile]
-	* [Upload a Large File in Multipart Way][#uploadlargefile]
-	* [Delete a bucket][#deletebucket]
-	* [Enable/Disable Logging for bucket][#logging]
-  * [Using Primitive API][#lowlevel]	
-* [Test][#test]
-* [Contribute][#contribute]
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Load Access Key ID and Access Key Secrete](#load)
+  * [Using Bucket API](#highlevel)
+    * [List Buckets](#listbuckets)
+	* [Create a Bucket](#newbucket)
+	* [List Files In Bucket](#listfiles)
+	* [Upload a File to Bucket](#uploadfile)
+	* [Download a File from Bucket](#downloadfile)
+	* [Share a File in Bucket](#sharefile)
+	* [Delete a File in Bucket](#deletefile)
+	* [Upload a Large File in Multipart Way](#uploadlargefile)
+	* [Delete a bucket](#deletebucket)
+	* [Enable/Disable Logging for bucket](#logging)
+  * [Using Primitive API](#lowlevel)
+* [Test](#test)
+* [Contribute](#contribute)
 
 ## <a name="installation"></a>Installation
 
