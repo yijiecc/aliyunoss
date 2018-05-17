@@ -10,6 +10,7 @@ Ruby gem for [Aliyun Open Storage Service (OSS)][1]. This gem implemented API fr
   * [Using Bucket API](#highlevel)
     * [List Buckets](#listbuckets)
 	* [Create a Bucket](#newbucket)
+	* [Open a Bucket](#openbucket)
 	* [List Files In Bucket](#listfiles)
 	* [Upload a File to Bucket](#uploadfile)
 	* [Download a File from Bucket](#downloadfile)
@@ -107,6 +108,16 @@ bucket = Aliyun::Oss::Bucket.create(bucket_name, bucket_location)
 ```
 	
 Where *bucket_name* is a string, and *bucket_location* is an optional string parameter which defaults to 'oss-cn-hangzhou'. Other available bucket locations can be referenced [here][5]. This method return a new Bucket instance if success.
+
+#### <a name="openbucket"></a>Open a bucket
+
+There is no such opeartion as opening a bucket, but you can build a Bucket class by:
+
+```ruby
+Aliyun::Oss::Bucket.new(name: 'bucket-name', location: 'oss-cn-beijing')
+```
+
+So you can continue to download or upload files using this Bucket instance.
 
 #### <a name="listfiles"></a>List all files in an bucket
 
