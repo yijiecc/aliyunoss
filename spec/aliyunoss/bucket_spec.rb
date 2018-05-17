@@ -6,6 +6,7 @@ describe Aliyun::Oss::Bucket do
 
   before :all do
     Aliyun::Oss.configure_with('spec/aliyunoss/config/aliyun-config.yml')
+    Aliyun::Oss.configure(logger: Logger.new(STDOUT))
     @bucket_name = "aliyunoss-gem-test-#{rand.to_s.delete('0.')}"
     @location = 'oss-cn-beijing'
     @bucket = Aliyun::Oss::Bucket.new( location: @location, name: @bucket_name)

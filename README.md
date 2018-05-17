@@ -7,6 +7,7 @@ Ruby gem for [Aliyun Open Storage Service (OSS)][1]. This gem implemented API fr
 * [Installation](#installation)
 * [Usage](#usage)
   * [Load Access Key ID and Access Key Secrete](#load)
+  * [Get Log Messages](#setlog)
   * [Using Bucket API](#highlevel)
     * [List Buckets](#listbuckets)
 	* [Create a Bucket](#newbucket)
@@ -62,6 +63,14 @@ Aliyun::Oss::configure(:access_key_id => 'access key id from aliyun', :access_ke
 ```
 	
 Then you can use the following APIs anywhere.
+
+### <a name="setlog"></a>Get Log Messages
+
+Log message is prohibited by default, you can pass a logger instace to enable it:
+
+```ruby
+Aliyun::Oss::configure(:logger => Logger.new(STDOUT))
+```
 
 ### <a name="highlevel"></a>Bucket API
 

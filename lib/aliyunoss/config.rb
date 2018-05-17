@@ -1,22 +1,28 @@
 require 'yaml'
 require 'logger'
 
+class NullLogger < Logger
+  def initialize(*args)
+  end
+
+  def add(*args, &block)
+  end
+end
+
+
 module Aliyun
   module Oss
 
     @config = {
-      :log_level => 'info',
+      :logger => nil,
       :host => 'aliyuncs.com',
       :access_key_id => nil,
       :access_key_secret => nil
     }
 
-    @_logger = nil
-
     @valid_config_keys = @config.keys
 
     def self.configure(opts = {})
-      @_logger = nil
       opts.each {|k,v| @config[k.to_sym] = v if @valid_config_keys.include?(k.to_sym)}
     end
 
@@ -36,11 +42,7 @@ module Aliyun
     end
 
     def self.logger
-      unless @_logger
-        @_logger ||= Logger.new(STDOUT)
-        @_logger.level = Logger.const_get(@config[:log_level].upcase) rescue Logger::INFO        
-      end
-      @_logger
+      @config[:logger] or (@null_logger ||= NullLogger.new)
     end
     
   end
