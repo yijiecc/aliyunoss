@@ -120,7 +120,7 @@ Where *bucket_name* is a string, and *bucket_location* is an optional string par
 
 #### <a name="openbucket"></a>Open a bucket
 
-There is no such opeartion as opening a bucket, but you can build a Bucket class by:
+There is no such opeartion as opening a bucket, but you can create a Bucket instance by:
 
 ```ruby
 Aliyun::Oss::Bucket.new(name: 'bucket-name', location: 'oss-cn-beijing')
