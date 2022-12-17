@@ -1,8 +1,7 @@
-source 'https://ruby.taobao.org/'
+source "https://rubygems.org"
 
 # Specify your gem's dependencies in aliyun-oss.gemspec
 gemspec
 
-gem 'nokogiri'
+gem 'nokogiri', '~> 1.13'
 
-gem 'byebug', :group => ['development', 'test']
