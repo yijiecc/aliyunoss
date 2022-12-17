@@ -16,7 +16,7 @@ describe 'Aliyun::Oss Configuration' do
   end
 
   it 'should accept configuration from #configure' do
-    url = "http://bucket_name.region.aliyuncs.com"
+    url = "https://bucket_name.region.aliyuncs.com"
     access_key = "access_key_from_aliyun"
     Aliyun::Oss.configure(:access_key_id => access_key, :not_used_para => "not used")
     config = Aliyun::Oss.config

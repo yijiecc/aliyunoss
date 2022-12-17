@@ -26,12 +26,12 @@ module Aliyun
       # 
       def get_uri
         if @domain
-          uri = URI("http://#{domain}/")
+          uri = URI("https://#{domain}/")
         else
           if @bucket
-            uri = URI("http://#{bucket.name}.#{bucket.location}.#{host}")
+            uri = URI("https://#{bucket.name}.#{bucket.location}.#{host}")
           else
-            uri = URI("http://oss.#{host}")
+            uri = URI("https://oss.#{host}")
           end
         end
         uri.path = @path
@@ -60,7 +60,7 @@ module Aliyun
           logger.info(verb.to_s.upcase + ' ' + uri.to_s + ' ' + request.to_hash.to_s)
           
           response = nil
-          Net::HTTP.start(uri.host, uri.port) do |http|
+          Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
             response = http.request(request)
             logger.info(response.code.to_s + ' ' + response.message)
           end
