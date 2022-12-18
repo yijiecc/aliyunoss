@@ -72,6 +72,26 @@ describe Aliyun::Oss::Bucket do
     end
   end
 
+  it 'get file info from server' do
+    path = '/test-1.png'
+    file_info = @bucket.get_file_info(path)
+    expect(file_info['server']).to eq('AliyunOSS')
+    expect(file_info['content-length']).to eq('127759')
+  end
+
+  it 'cannot get file info if file not existed' do
+    path = '/test-8.png'
+    expect(@bucket.exist?(path)).to be false
+
+    path = '/test-3.png'
+    expect(@bucket.exist?(path)).to be true
+  end
+
+  it 'get public url for file' do
+    path = '/test-3.png'
+    expect(@bucket.public_url(path)).to eq("https://#{@bucket_name}.oss-cn-beijing.aliyuncs.com/test-3.png")
+  end
+
   it 'should delete file on server' do
     ['/test-1.png','/test-2.png','/test-3.png', '/multi-part-test.dat', '/multi-part-copy.dat'].each do |path|
       @bucket.delete(path)

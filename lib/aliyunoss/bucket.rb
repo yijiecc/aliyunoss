@@ -50,11 +50,46 @@ module Aliyun
           .body
       end
 
+      # 
+      # Get file info 
+      # 
+      def get_file_info(path)
+        hash = Hash.new
+        Aliyun::Oss::API.head_object(self, path).raise_unless(Net::HTTPOK).each_header do |k,v|
+          hash[k] = v
+        end
+        hash
+      end
+
+      # 
+      # Test if a file exist
+      # return true/false
+      # 
+      def exist?(path)
+        begin
+          Aliyun::Oss::API.head_object(self, path).raise_unless(Net::HTTPOK)
+          true
+        rescue OssException => ex
+          if (ex.message.include? 'Net::HTTPNotFound') 
+            false
+          else
+            raise ex
+          end
+        end
+      end
+
       #
       # Generate a url that can be shared to others
       # 
       def share(path, expires_in = 3600)
         Aliyun::Oss::API.generate_share_url(self, path, expires_in)
+      end
+
+      # 
+      # Generate public url for path
+      # 
+      def public_url(path)
+        "https://#{name}.#{location}.aliyuncs.com#{path}"
       end
 
       #
