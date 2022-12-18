@@ -45,9 +45,12 @@ module Aliyun
       # Download file from remote server
       # 
       def download(path, options = {})
-        Aliyun::Oss::API.get_object(self, path, options)
-          .raise_unless(Net::HTTPOK)
-          .body
+        response = Aliyun::Oss::API.get_object(self, path, options)
+        if response.code.to_i >= 200 and response.code.to_i < 300
+          response.body
+        else
+          raise OssException.new(response)
+        end
       end
 
       # 
