@@ -98,6 +98,8 @@ module Aliyun
           "Content-Length" => content_length
         }
 
+        @headers["x-oss-date"] = @headers["Date"]
+
         if filename != nil
           @headers["Content-Disposition"] = "attachment; filename=\"#{filename}\""
         end
