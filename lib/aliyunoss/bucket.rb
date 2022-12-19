@@ -88,6 +88,16 @@ module Aliyun
         Aliyun::Oss::API.generate_share_url(self, path, expires_in)
       end
 
+      def direct_upload_headers(path, filename: nil, 
+                             content_type:, content_length:, checksum:, custom_metadata: {})
+        Aliyun::Oss::API.headers_for_upload(self, path, 
+                                            filename: filename,
+                                            content_type: content_type,
+                                            content_length: content_length,
+                                            checksum: checksum,
+                                            custom_metadata: custom_metadata)
+      end
+
       # 
       # Generate public url for path
       # 

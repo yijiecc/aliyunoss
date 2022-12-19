@@ -26,10 +26,10 @@ module Aliyun
       # 
       def get_uri
         if @domain
-          uri = URI("https://#{domain}/")
+          uri = URI("https://#{@domain}/")
         else
           if @bucket
-            uri = URI("https://#{bucket.name}.#{bucket.location}.#{host}")
+            uri = URI("https://#{@bucket.name}.#{@bucket.location}.#{host}")
           else
             uri = URI("https://oss.#{host}")
           end
@@ -87,6 +87,25 @@ module Aliyun
                                          "Expires" => expires_at,
                                          "Signature" => signature(request)})
         uri.to_s
+      end
+
+      def headers_for_write(filename: nil, content_type:, content_length:, 
+                            checksum:, custom_metadata: {})
+        @headers = {
+          "Content-Type" => content_type, 
+          "Content-MD5" => checksum, 
+          "Date" => Time.now.utc.strftime('%a, %d %b %Y %H:%M:%S GMT'),
+          "Content-Length" => content_length
+        }
+
+        if filename != nil
+          @headers["Content-Disposition"] = "attachment; filename=\"#{filename}\""
+        end
+
+        request = Net::HTTP.send(:const_get, 'Put').new(get_uri)
+        @headers.each_pair {|k,v| request[k] = v}
+        @headers['Authorization'] = 'OSS ' +  access_key_id + ':' + signature(request)
+        @headers
       end
 
       #
@@ -160,6 +179,7 @@ module Aliyun
           if @queries[k] then "#{k}=#{@queries[k]}" else "#{k}" end
         end
           
+
         "/#{@bucket.name}#{@path}?#{array.sort.join('&')}"
       end
 

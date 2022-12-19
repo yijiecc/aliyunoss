@@ -209,6 +209,19 @@ HERE
       end
 
       # 
+      # return headers for uploading object
+      # options
+      # 
+      def headers_for_upload(bucket, path, filename: nil, 
+                             content_type:, content_length:, checksum:, custom_metadata: {})
+        Aliyun::Oss::OssRequest.new(bucket, path).headers_for_write(filename: filename,
+                                                                    content_type: content_type,
+                                                                    content_length: content_length,
+                                                                    checksum: checksum,
+                                                                    custom_metadata: custom_metadata)
+      end
+
+      # 
       # Post Object
       #
       # Not implemented

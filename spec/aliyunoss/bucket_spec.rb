@@ -41,6 +41,30 @@ describe Aliyun::Oss::Bucket do
     expect(data.length).to eq(File.open( File.join(__dir__, "png", "test-1.png")).size)
   end
 
+  it 'should generate direct upload headers' do
+    file = File.join(__dir__, 'png', 'test-1.png')
+    md5 = OpenSSL::Digest::MD5
+    checksum = Base64.encode64(md5.digest(IO.read(file))).strip
+    headers = @bucket.direct_upload_headers('/test-1.png', 
+                                            filename: 'test-1.png',
+                                            content_type: 'image/png',
+                                            content_length: IO.read(file).bytesize,
+                                            checksum: checksum,
+                                            custom_metadata: {})
+    
+    # Now let's upload using these headers
+    uri = URI("https://#{@bucket.name}.#{@bucket.location}.aliyuncs.com/test-1.png")
+    request = Net::HTTP::Put.new(uri)
+    headers.each_pair { |k,v| request[k] = v }
+    request.body = IO.read(file)
+
+    Net::HTTP.start(uri.host, uri.port, :use_ssl => true) do |http|
+      response = http.request(request)
+      expect(response.code.to_s).to eq('200')
+    end
+    
+  end
+
   it 'should upload data to server in multipart way' do
     path = '/multi-part-test.dat'
     @bucket.multipart_upload_initiate(path)
